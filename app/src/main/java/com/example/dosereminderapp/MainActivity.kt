@@ -21,12 +21,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.dosereminderapp.ui.theme.DoseReminderAppTheme
 
 import androidx.navigation.compose.composable
-import com.example.dosereminderapp.api.DSManager
 import  com.example.dosereminderapp.destinations.Destination
 import com.example.dosereminderapp.screens.AddMedicineScreen
 import com.example.dosereminderapp.screens.PillBoxScreen
 import com.example.dosereminderapp.screens.TodayScreen
 import com.example.dosereminderapp.view.BottomNav
+
 
 
 class MainActivity : ComponentActivity() {
