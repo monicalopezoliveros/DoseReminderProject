@@ -39,14 +39,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.dosereminderapp.api.ProductManager
 import com.example.dosereminderapp.api.model.Product
 
 import com.example.dosereminderapp.api.model.Result
+import com.example.dosereminderapp.destinations.Destination
 
 
 @Composable
-fun AddMedicineScreen(modifier: Modifier){
+fun AddMedicineScreen(modifier: Modifier, navController: NavController){
     val productManager = remember { ProductManager() }
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) } // Status for the text entered by the user
     var hasSearched by remember { mutableStateOf(false) }
@@ -117,13 +119,28 @@ fun AddMedicineScreen(modifier: Modifier){
         Spacer(modifier = Modifier.height(16.dp))
 
         // List of products displayed after search
-        ProductList(products = productManager.productResponse.value, hasSearched = hasSearched )
+        ProductList(
+            products = productManager.productResponse.value,
+            hasSearched = hasSearched,
+            onProductSelected = { selectedProduct ->
+                // Navigate to the reminder settings screen with the selected product.
+                //val productNumber = selectedProduct.productNumber ?: "unknown"
+                val strength = selectedProduct.activeIngredients?.firstOrNull()?.strength ?: "Unknown"
+                val productName = "${selectedProduct.brandName} - $strength"
+                navController.navigate(Destination.ConfigReminder.createRoute(productName))
+                //"$brandName - $strength",
+            }
+        )
 
     }
 }
 
 @Composable
-fun ProductList(products: List<Result>, hasSearched: Boolean) {
+fun ProductList(
+    products: List<Result>,
+    hasSearched: Boolean,
+    onProductSelected: (Product) -> Unit
+) {
     var selectedProductIndex by remember { mutableStateOf(-1) } // -1 means no selection
 
     when {
@@ -143,6 +160,7 @@ fun ProductList(products: List<Result>, hasSearched: Boolean) {
                                 product = product,
                                 onClick = {
                                     selectedProductIndex = if (selectedProductIndex == index) -1 else index // Change the selection
+                                    onProductSelected(product)
                                 },
                                 isSelected = selectedProductIndex == index // Determines if the product is selected
                             )

@@ -21,10 +21,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.dosereminderapp.ui.theme.DoseReminderAppTheme
 
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import  com.example.dosereminderapp.destinations.Destination
 import com.example.dosereminderapp.screens.AddMedicineScreen
 import com.example.dosereminderapp.screens.PillBoxScreen
 import com.example.dosereminderapp.screens.TodayScreen
+import com.example.dosereminderapp.screens.ConfigReminderScreen
 import com.example.dosereminderapp.view.BottomNav
 
 
@@ -70,7 +72,17 @@ fun App(navController: NavController, modifier: Modifier){
                 PillBoxScreen(modifier= Modifier.padding(paddingValues))
             }
             composable(Destination.AddMedicine.route) {
-                AddMedicineScreen(modifier= Modifier.padding(paddingValues))
+                AddMedicineScreen(modifier= Modifier.padding(paddingValues), navController = navController)
+            }
+            composable(
+                route = Destination.ConfigReminder.route,
+                arguments = listOf(navArgument("productName") { defaultValue = "" })
+            ) { backStackEntry ->
+                val productName = backStackEntry.arguments?.getString("productName") ?: ""
+                ConfigReminderScreen(
+                    modifier = modifier,
+                    productName = productName
+                )
             }
             
         }
