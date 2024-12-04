@@ -1,11 +1,14 @@
 package com.example.dosereminderapp.api.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
+@Entity
 data class Product(
-    @Json(name = "product_number")
+    @PrimaryKey @Json(name = "product_number")
     val productNumber: String?,
     @Json(name = "reference_drug")
     val referenceDrug: String?,

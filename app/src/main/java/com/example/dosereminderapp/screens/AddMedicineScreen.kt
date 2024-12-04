@@ -145,7 +145,7 @@ fun ProductList(
 
     when {
         products.isEmpty() && hasSearched -> {
-            Text("No results found.", modifier = Modifier.padding(16.dp))
+            Text("", modifier = Modifier.padding(16.dp))// No results found.
         }
         products.isNotEmpty() -> {
             LazyColumn(

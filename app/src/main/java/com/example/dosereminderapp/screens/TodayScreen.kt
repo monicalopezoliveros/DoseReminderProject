@@ -28,9 +28,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dosereminderapp.R
+import com.example.dosereminderapp.db.AppDatabase
 
 @Composable
-fun TodayScreen(modifier: Modifier){
+fun TodayScreen(modifier: Modifier, db: AppDatabase){
     Box(
         modifier = modifier
             .fillMaxSize()

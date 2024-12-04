@@ -30,21 +30,39 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.dosereminderapp.api.model.Medication
+import com.example.dosereminderapp.api.model.Reminder
 
 import com.example.dosereminderapp.components.CustomSpinner
+import com.example.dosereminderapp.components.CustomSpinner2
+import com.example.dosereminderapp.db.AppDatabase
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+import androidx.navigation.NavController
+import com.example.dosereminderapp.destinations.Destination
 
 @Composable
-fun ConfigReminderScreen(modifier: Modifier, productName: String) {
+fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabase, navController: NavController) {
     var selectedOption by remember { mutableStateOf("Option 1") }
     val options = listOf("Option 1", "Option 2", "Option 3")
 
+    // Variables for reminder data
+    var quantity by remember { mutableStateOf("1") }
+    var dosage by remember { mutableStateOf("Capsule(s)") }
+    var frequency by remember { mutableStateOf("Once a day") }
+    var time by remember { mutableStateOf("8:00") }
+    var dayPart by remember { mutableStateOf("AM") }
+    var startTo by remember { mutableStateOf("Today") }
 
     Column(modifier = modifier
         .fillMaxSize()
         .padding(0.dp)
         .background(Color(red = 200, green = 222, blue = 255)),
         //.border(2.dp, Color.Red),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(1.dp) // Espaciado uniforme entre filas
     ){
 
@@ -59,12 +77,12 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String) {
             .padding(14.dp)
             .width(400.dp)
         )
-        // Fila 1
+        // Fila 1: Quantity and Dosage
         Row (
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
-                .background(Color(252,227,220), shape = RoundedCornerShape(8.dp)) // Fondo gris claro y bordes redondeados
-                //.border(2.dp, Color.Blue, RoundedCornerShape(8.dp)) // Borde azul y bordes redondeados
+                .background(Color(252,227,220), shape = RoundedCornerShape(8.dp))
+                //.border(2.dp, Color.Blue, RoundedCornerShape(8.dp))
                 .wrapContentHeight()
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),  // Espacio entre los elementos
@@ -82,7 +100,8 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String) {
                     backgroundColor = Color.White,
                     fontSize = 18.sp,
                     borderColor = Color(0xFFFFFFFF),
-                    labelSpinner = "Quantity"
+                    labelSpinner = "Quantity",
+                    onItemSelected = { selected -> quantity = selected }
                 )
             }
 
@@ -98,12 +117,13 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String) {
                     backgroundColor = Color.White, // Light Yellow,
                     fontSize = 18.sp,
                     borderColor = Color(0xFFFFFFFF),
-                    labelSpinner = "Dosage"
+                    labelSpinner = "Dosage",
+                    onItemSelected = { selected -> dosage = selected }
                 )
             }
         }
 
-        // Fila 2
+        // Fila 2: Frequency
         Row(
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -120,13 +140,14 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String) {
                     backgroundColor = Color.White,
                     fontSize = 18.sp,
                     borderColor = Color(0xFFFFFFFF),
-                    labelSpinner = "Frequency"
+                    labelSpinner = "Frequency",
+                    onItemSelected = { selected -> frequency = selected }
                 )
             }
 
         }
 
-        // Fila 3
+        // Fila 3: Time and Day Part
         Row(
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -143,7 +164,8 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String) {
                     backgroundColor = Color.White,
                     fontSize = 18.sp,
                     borderColor = Color(0xFFFFFFFF),
-                    labelSpinner = "Time"
+                    labelSpinner = "Time",
+                    onItemSelected = { selected -> time = selected }
                 )
             }
 
@@ -154,13 +176,14 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String) {
                     backgroundColor = Color.White,
                     fontSize = 18.sp,
                     borderColor = Color(0xFFFFFFFF),
-                    labelSpinner = "Day Part"
+                    labelSpinner = "Day Part",
+                    onItemSelected = { selected -> dayPart = selected }
                 )
             }
 
         }
 
-        // Fila 4
+        // Fila 4: Start to
         Row(
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -177,13 +200,14 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String) {
                     backgroundColor = Color.White,
                     fontSize = 18.sp,
                     borderColor = Color(0xFFFFFFFF),
-                    labelSpinner = "Start to"
+                    labelSpinner = "Start to",
+                    onItemSelected = { selected -> startTo = selected }
                 )
             }
 
         }
 
-        // Fila 5
+        // Fila 5: Button to add reminder
         Row(
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -194,29 +218,55 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = { /* Acción del botón */ },
+                onClick = {
+                    // Aquí creamos el ID y guardamos el recordatorio
+                    val newMedication = Medication(
+                        name = productName,
+                        quantity = quantity.toInt(),
+                        dosage = dosage,
+                        frequency = frequency,
+                        time = time,
+                        dayPart = dayPart,
+                        startTo = startTo
+                    )
+                    println("va a llamar saveMedicationToDatabase")
+
+                    // Guardar el medicamento en la base de datos
+                    saveMedicationToDatabase(newMedication, db)
+
+                    // Navegar a la pantalla de PillBoxScreen
+                    navController.navigate(Destination.PillBox.route)// Navegar a la pantalla PillBoxScreen
+                },
                 modifier = Modifier
-                    //.background(Color(255, 68, 13))  // Color RGB específico (ejemplo: verde)
                     .width(300.dp)
                     .height(80.dp)// Ancho específico del botón
-                    .padding(12.dp),  // Opcional: agregar relleno interno al botón
+                    .padding(12.dp),  // relleno interno al botón
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(255, 68, 13)  // Color RGB específico (ejemplo: verde)
+                    containerColor = Color(255, 68, 13)
                 ),
-                shape = RoundedCornerShape(8.dp) // Radio de las esquinas del botón
+                shape = RoundedCornerShape(8.dp) // Button Corner Radius
             ) {
                 Text(
                     text = "Add Reminder",
                     style = TextStyle(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White  // Color del texto del botón
+                        color = Color.White  // Button text color
                     )
                 )
             }
 
         }
+    }
+}
 
+fun saveMedicationToDatabase(medication: Medication, db: AppDatabase) {
+    // Usamos withContext para mover la operación de base de datos a un hilo en segundo plano
+    kotlinx.coroutines.GlobalScope.launch {
+        withContext(Dispatchers.IO) {
+            db.medicationDao().insertMedication(medication)
+            println("ya llamo  a saveMedicationToDatabase")
+        }
     }
 }
 

@@ -22,6 +22,7 @@ import com.example.dosereminderapp.ui.theme.DoseReminderAppTheme
 
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.dosereminderapp.db.AppDatabase
 import  com.example.dosereminderapp.destinations.Destination
 import com.example.dosereminderapp.screens.AddMedicineScreen
 import com.example.dosereminderapp.screens.PillBoxScreen
@@ -40,8 +41,13 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
+
                     val navController = rememberNavController()
-                    App(navController = navController, modifier= Modifier.padding(innerPadding))
+
+                    // get db instance
+                    val db = AppDatabase.getInstance(applicationContext)
+                    App(navController = navController, modifier= Modifier.padding(innerPadding), db)
+
                 }
             }
         }
@@ -50,7 +56,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App(navController: NavController, modifier: Modifier){
+fun App(navController: NavController, modifier: Modifier, db: AppDatabase){
     Scaffold (
         topBar = {
             TopAppBar(
@@ -66,22 +72,24 @@ fun App(navController: NavController, modifier: Modifier){
 
         NavHost(navController = navController as NavHostController, startDestination = Destination.Today.route) {
             composable(Destination.Today.route) {
-                TodayScreen(modifier= Modifier.padding(paddingValues))
+                TodayScreen(modifier= Modifier.padding(paddingValues), db = db)
             }
             composable(Destination.PillBox.route) {
-                PillBoxScreen(modifier= Modifier.padding(paddingValues))
+                PillBoxScreen(modifier= Modifier.padding(paddingValues), db = db)
             }
             composable(Destination.AddMedicine.route) {
                 AddMedicineScreen(modifier= Modifier.padding(paddingValues), navController = navController)
             }
             composable(
                 route = Destination.ConfigReminder.route,
-                arguments = listOf(navArgument("productName") { defaultValue = "" })
+                arguments = listOf(navArgument("productName") { type = androidx.navigation.NavType.StringType })
             ) { backStackEntry ->
-                val productName = backStackEntry.arguments?.getString("productName") ?: ""
+                val productName  = backStackEntry.arguments?.getString("productName") ?: ""
                 ConfigReminderScreen(
                     modifier = modifier,
-                    productName = productName
+                    productName = productName,
+                    db = db,
+                    navController = navController
                 )
             }
             

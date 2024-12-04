@@ -5,11 +5,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.example.dosereminderapp.api.model.ProductData
 import com.example.dosereminderapp.api.model.Result
+import com.example.dosereminderapp.db.AppDatabase
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ProductManager (){
+class ProductManager {
+    //(database: AppDatabase)
     private var _productResponse = mutableStateOf<List<Result>>(emptyList())
 
     val productResponse : MutableState<List<Result>> get() = _productResponse
