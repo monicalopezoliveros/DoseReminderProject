@@ -11,7 +11,7 @@ import com.example.dosereminderapp.api.model.Medication
 interface MedicationDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMedication(medication: Medication) // Inserta o reemplaza un registro de medicamento
+    suspend fun insertMedication(medication: Medication):Long // Inserta o reemplaza un registro de medicamento
 
     @Query("SELECT * FROM medications WHERE id = :id")
     suspend fun getMedicationById(id: Int): Medication? // Obtiene un medicamento por su ID

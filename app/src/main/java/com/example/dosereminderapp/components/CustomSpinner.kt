@@ -56,61 +56,62 @@ fun CustomSpinner(
     val density = LocalDensity.current
 
 
-        OutlinedTextField(
-            value = selectedText,
-            onValueChange = { selectedText = it },
-            label = { Text(text = labelSpinner) },
-            enabled = false, // Disable editing
-            readOnly = true, // Make text field read-only
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown, // Dropdown arrow icon
-                    contentDescription = "Dropdown arrow",
-                    modifier = Modifier
-                        //.background(color = Color(0, 151, 254), shape = RoundedCornerShape(5))
-                        .width(44.dp)
-                        .height(height),
-                    //tint = Color.White
-                )
-            },
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = fontSize,  // Set font size
-                fontWeight = FontWeight.Normal
-            ),
-            colors = TextFieldDefaults.colors(
-                disabledIndicatorColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent
-            ),
-            modifier = Modifier
-                //.fillMaxWidth()
-                .height(height)
-                .clickable { isExpanded = true } // Open dropdown on click
-                .background(backgroundColor)
-                .border(1.dp, borderColor, RoundedCornerShape(10.dp))
-                .width(width)
-                .onGloballyPositioned { coordinates ->
-                    val position = coordinates.positionInWindow()
-                    dropdownPositionY = position.y + coordinates.size.height
-                }
-        )
-
-        DropdownMenu(
-            expanded = isExpanded, // Show or hide the dropdown
-            onDismissRequest = { isExpanded = false },
-            offset = DpOffset(0.dp, with(density) { dropdownPositionY.toDp() }),
-            modifier = Modifier
-                .width(width)
-                .background(backgroundColor)
-           ) {
-            items.forEach { item -> // Loop through each item in the list
-                DropdownMenuItem(
-                    text = { Text(text = item, fontSize = fontSize) },
-                    onClick = {
-                        isExpanded = false
-                        selectedText = item
-                    }
-                )
+    OutlinedTextField(
+        value = selectedText,
+        onValueChange = { selectedText = it },
+        label = { Text(text = labelSpinner) },
+        enabled = false, // Disable editing
+        readOnly = true, // Make text field read-only
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown, // Dropdown arrow icon
+                contentDescription = "Dropdown arrow",
+                modifier = Modifier
+                    //.background(color = Color(0, 151, 254), shape = RoundedCornerShape(5))
+                    .width(44.dp)
+                    .height(height),
+                //tint = Color.White
+            )
+        },
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = fontSize,  // Set font size
+            fontWeight = FontWeight.Normal
+        ),
+        colors = TextFieldDefaults.colors(
+            disabledIndicatorColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent
+        ),
+        modifier = Modifier
+            //.fillMaxWidth()
+            .height(height)
+            .clickable { isExpanded = true } // Open dropdown on click
+            .background(backgroundColor)
+            .border(1.dp, borderColor, RoundedCornerShape(10.dp))
+            .width(width)
+            .onGloballyPositioned { coordinates ->
+                val position = coordinates.positionInWindow()
+                dropdownPositionY = position.y + coordinates.size.height
             }
+    )
+
+    DropdownMenu(
+        expanded = isExpanded, // Show or hide the dropdown
+        onDismissRequest = { isExpanded = false },
+        offset = DpOffset(0.dp, with(density) { dropdownPositionY.toDp() }),
+        modifier = Modifier
+            .width(width)
+            .background(backgroundColor)
+       ) {
+        items.forEach { item -> // Loop through each item in the list
+            DropdownMenuItem(
+                text = { Text(text = item, fontSize = fontSize) },
+                onClick = {
+                    isExpanded = false
+                    selectedText = item
+                    onItemSelected(item)
+                }
+            )
         }
+    }
 
 }

@@ -123,12 +123,10 @@ fun AddMedicineScreen(modifier: Modifier, navController: NavController){
             products = productManager.productResponse.value,
             hasSearched = hasSearched,
             onProductSelected = { selectedProduct ->
-                // Navigate to the reminder settings screen with the selected product.
-                //val productNumber = selectedProduct.productNumber ?: "unknown"
                 val strength = selectedProduct.activeIngredients?.firstOrNull()?.strength ?: "Unknown"
                 val productName = "${selectedProduct.brandName} - $strength"
                 navController.navigate(Destination.ConfigReminder.createRoute(productName))
-                //"$brandName - $strength",
+
             }
         )
 

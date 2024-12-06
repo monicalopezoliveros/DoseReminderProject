@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,22 +45,39 @@ fun PillBoxScreen(modifier: Modifier, db: AppDatabase) {
             .background(Color(red = 200, green = 222, blue = 255))
     ) {
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)  // Add padding around the list
-        ) {
-            // Display a card for each medication
-            items(medications.value) { medication ->
-                MedicationCard(medication)
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Add the title text at the top
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Pill Box",  // Título de la página
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(red = 68, green = 140, blue = 252),
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // LazyColumn for the list of medications
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)  // Add padding around the list
+            ) {
+                // Display a card for each medication
+                items(medications.value) { medication ->
+                    MedicationCard(medication, db) { deletedMedicationId ->
+                        medications.value =
+                            medications.value.filter { it.id != deletedMedicationId }
+                        //MedicationCard(medication, db)
+                    }
+                }
             }
         }
-
     }
 }
 
 @Composable
-fun MedicationCard(medication: Medication) {
+fun MedicationCard(medication: Medication, db: AppDatabase, onDelete: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,12 +103,38 @@ fun MedicationCard(medication: Medication) {
             )
 
             // Column with information about the medicine
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(text = medication.name, fontWeight = FontWeight.Bold)
-                Text(text = "${medication.quantity} Tablet(s)")  // Assuming quantity represents tablets
+                Text(text = "${medication.quantity} ${medication.dosage}")
                 Text(text = medication.frequency)
                 Text(text = medication.time)  // You can format this more if needed
             }
+
+            // X IconButton to delete the medication
+            IconButton(
+                onClick = {
+                    // Coroutine to delete the medication from the database
+                    deleteMedication(db, medication.id, onDelete)
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel), // Use the system X icon
+                    contentDescription = "Delete Medication",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Red
+                )
+            }
         }
+    }
+}
+
+fun deleteMedication(db: AppDatabase, medicationId: Int, onDelete: (Int) -> Unit) {
+    // Coroutine to delete the medication from the database
+    kotlinx.coroutines.GlobalScope.launch {
+        db.medicationDao().deleteMedicationById(medicationId)
+        // Fetch updated list of medications
+        //val updatedMedications = db.medicationDao().getAllMedications()
+        // Call the onDelete callback to update the UI
+        onDelete(medicationId)
     }
 }

@@ -29,12 +29,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.example.dosereminderapp.api.model.Medication
 import com.example.dosereminderapp.api.model.Reminder
 
 import com.example.dosereminderapp.components.CustomSpinner
-import com.example.dosereminderapp.components.CustomSpinner2
 import com.example.dosereminderapp.db.AppDatabase
 
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +43,13 @@ import kotlinx.coroutines.withContext
 
 import androidx.navigation.NavController
 import com.example.dosereminderapp.destinations.Destination
+
+import java.time.LocalTime
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+import java.util.*
 
 @Composable
 fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabase, navController: NavController) {
@@ -63,7 +70,7 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
         .background(Color(red = 200, green = 222, blue = 255)),
         //.border(2.dp, Color.Red),
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(1.dp) // Espaciado uniforme entre filas
+        verticalArrangement = Arrangement.spacedBy(1.dp) // Uniform spacing between rows
     ){
 
         Spacer(modifier = Modifier.height(44.dp))
@@ -77,7 +84,7 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
             .padding(14.dp)
             .width(400.dp)
         )
-        // Fila 1: Quantity and Dosage
+        // Row 1: Quantity and Dosage
         Row (
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -85,7 +92,7 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
                 //.border(2.dp, Color.Blue, RoundedCornerShape(8.dp))
                 .wrapContentHeight()
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),  // Espacio entre los elementos
+            horizontalArrangement = Arrangement.spacedBy(16.dp),  // Space between elements
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -106,15 +113,12 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
             }
 
             Box(
-                modifier = Modifier.weight(2f) // Usa un peso para que se ajuste dinámicamente
+                modifier = Modifier.weight(2f) // Use a weight to make it dynamically adjust
             ) {
                 CustomSpinner(
-                    items = arrayOf(
-                        "Capsule(s)", "Tablet(s)", "Puff(s)", "Drop(s)", "Pill(s)",
-                        "Injection(s)", "Patch(s)", "Implant(s)", "Suppository(ies)", "ml"
-                    ),
+                    items = arrayOf("Tablet(s)", "Capsule(s)", "Puff(s)", "Drop(s)", "Pill(s)", "Injection(s)", "Patch(s)", "Implant(s)", "Suppository(ies)", "ml"),
                     width = 180.dp,
-                    backgroundColor = Color.White, // Light Yellow,
+                    backgroundColor = Color.White,
                     fontSize = 18.sp,
                     borderColor = Color(0xFFFFFFFF),
                     labelSpinner = "Dosage",
@@ -123,7 +127,7 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
             }
         }
 
-        // Fila 2: Frequency
+        // Row 2: Frequency
         Row(
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -147,7 +151,7 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
 
         }
 
-        // Fila 3: Time and Day Part
+        // Row 3: Time and Day Part
         Row(
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -183,7 +187,7 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
 
         }
 
-        // Fila 4: Start to
+        // Row 4: Start to
         Row(
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -207,7 +211,7 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
 
         }
 
-        // Fila 5: Button to add reminder
+        // Row 5: Button to add reminder
         Row(
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -217,30 +221,42 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val coroutineScope = rememberCoroutineScope()
+
             Button(
                 onClick = {
-                    // Aquí creamos el ID y guardamos el recordatorio
-                    val newMedication = Medication(
-                        name = productName,
-                        quantity = quantity.toInt(),
-                        dosage = dosage,
-                        frequency = frequency,
-                        time = time,
-                        dayPart = dayPart,
-                        startTo = startTo
-                    )
-                    println("va a llamar saveMedicationToDatabase")
+                    coroutineScope.launch {
+                        // Calculate startTime
+                        val startTime = calculateStartTime(time, dayPart, startTo)
 
-                    // Guardar el medicamento en la base de datos
-                    saveMedicationToDatabase(newMedication, db)
+                        // Create the medication
+                        val newMedication = Medication(
+                            name = productName,
+                            quantity = quantity.toInt(),
+                            dosage = dosage,
+                            frequency = frequency,
+                            time = time,
+                            dayPart = dayPart,
+                            startTo = startTo
+                        )
 
-                    // Navegar a la pantalla de PillBoxScreen
-                    navController.navigate(Destination.PillBox.route)// Navegar a la pantalla PillBoxScreen
+                        // Save the medicine in the database
+                        //saveMedicationToDatabase(newMedication, db, startTime)
+
+                        saveMedicationWithReminder(newMedication, db, startTime)
+
+                        //val nextReminder = createNextReminder(newMedication, startTime)
+
+                        //saveReminderToDatabase(nextReminder, db)
+
+                        // Navigate to the PillBoxScreen screen
+                        navController.navigate(Destination.PillBox.route)
+                    }
                 },
                 modifier = Modifier
                     .width(300.dp)
-                    .height(80.dp)// Ancho específico del botón
-                    .padding(12.dp),  // relleno interno al botón
+                    .height(80.dp)
+                    .padding(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(255, 68, 13)
                 ),
@@ -260,14 +276,109 @@ fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabas
     }
 }
 
-fun saveMedicationToDatabase(medication: Medication, db: AppDatabase) {
-    // Usamos withContext para mover la operación de base de datos a un hilo en segundo plano
+fun saveMedicationToDatabase(medication: Medication, db: AppDatabase, startTime: Long){
+    // withContext is used to move the database operation to a background thread
     kotlinx.coroutines.GlobalScope.launch {
         withContext(Dispatchers.IO) {
             db.medicationDao().insertMedication(medication)
-            println("ya llamo  a saveMedicationToDatabase")
+            //val medicationId = db.medicationDao().insertMedication(medication)
+
+           // Crear el primer recordatorio basado en la frecuencia
+            //val reminder = createNextReminder(medication, startTime)
+
+            //db.reminderDao().insertReminder(reminder)
+            // Retornamos el ID generado
+
         }
     }
 }
+
+fun saveReminderToDatabase(newReminder: Reminder,  db: AppDatabase){
+    // withContext is used to move the database operation to a background thread
+    kotlinx.coroutines.GlobalScope.launch {
+        withContext(Dispatchers.IO) {
+            db.reminderDao().insertReminder(newReminder)
+        }
+    }
+}
+
+fun createNextReminder(medication: Medication, startTime: Long): Reminder  {
+
+    val interval = when (medication.frequency) {
+        "Once a day" -> 24 * 60 * 60 * 1000L // 24 horas en milisegundos
+        "Twice a day" -> 12 * 60 * 60 * 1000L // Cada 12 horas
+        "Three times a day" -> 8 * 60 * 60 * 1000L // Cada 8 horas
+        "Every 4 hours" -> 4 * 60 * 60 * 1000L
+        "Every 8 hours" -> 8 * 60 * 60 * 1000L
+        "Every other day" -> 48 * 60 * 60 * 1000L
+        else -> 24 * 60 * 60 * 1000L // Default value
+    }
+
+    // Calculate the next reminder
+    val nextReminderTime = startTime + interval // Add the interval to the startTime to get the following
+
+    return Reminder(
+        medicationId = medication.id,
+        startTime = startTime,
+        startDateOption = medication.startTo.lowercase().replace(" ", "_"),
+        frequency = medication.frequency,
+        nextReminderTime = nextReminderTime, // The following reminder is saved
+        status = "active",
+        createdAt = System.currentTimeMillis(),
+        updatedAt = System.currentTimeMillis()
+    )
+}
+
+fun calculateStartTime(time: String, dayPart: String, startTo: String): Long {
+    // Create a Calendar object and set the time
+    val calendar = Calendar.getInstance()
+
+    // Extract hour and minute from string
+    val (hour, minute) = time.split(":").map { it.trim() }
+    var hourInt = hour.toInt()
+
+    // Set time to AM/PM
+    if (dayPart == "PM" && hourInt != 12) {
+        hourInt += 12
+    } else if (dayPart == "AM" && hourInt == 12) {
+        hourInt = 0
+    }
+
+    // Setting the hour and minute on the calendar
+    calendar.set(Calendar.HOUR_OF_DAY, hourInt)
+    calendar.set(Calendar.MINUTE, minute.toInt())
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+
+    // Determine the base date (Today, Tomorrow, In 2 Days)
+    val today = Calendar.getInstance()
+    when (startTo) {
+        "Today" -> {}
+        "Tomorrow" -> calendar.add(Calendar.DAY_OF_YEAR, 1)
+        "In 2 Days" -> calendar.add(Calendar.DAY_OF_YEAR, 2)
+    }
+
+    return calendar.timeInMillis
+}
+
+suspend fun saveMedicationWithReminder(
+    medication: Medication,
+    db: AppDatabase,
+    startTime: Long
+) {
+    withContext(Dispatchers.IO) {
+        // Insert the medication and retrieve your ID
+        val medicationId = db.medicationDao().insertMedication(medication)
+
+        // Create and save the first reminder
+        val reminder = createNextReminder(
+            medication.copy(id = medicationId.toInt()),
+            startTime
+        )
+        db.reminderDao().insertReminder(reminder)
+    }
+}
+
+
 
 

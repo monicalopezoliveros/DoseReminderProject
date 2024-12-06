@@ -3,6 +3,7 @@ package com.example.dosereminderapp.api.model
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.time.ZonedDateTime
 
 @Entity(
     foreignKeys = [ForeignKey(
@@ -15,7 +16,11 @@ import androidx.room.PrimaryKey
 data class Reminder(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val medicationId: Int,
-    val reminderTime: Long,
-    val frequency: String,
-    val notes: String? = null
+    val startTime: Long, // Start time of first reminder
+    val startDateOption: String, // "today", "tomorrow", or "in_2_days"
+    val frequency: String, // Reminder frequency (every 4 hours, etc.)
+    val nextReminderTime: Long, // Time for next reminder
+    val status: String = "active", //Reminder status
+    val createdAt: Long = System.currentTimeMillis(), // Creation date
+    val updatedAt: Long = System.currentTimeMillis() // Last Update Date
 )

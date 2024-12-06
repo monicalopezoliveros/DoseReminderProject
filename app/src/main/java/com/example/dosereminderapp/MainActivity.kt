@@ -13,6 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -44,6 +47,8 @@ class MainActivity : ComponentActivity() {
 
                     val navController = rememberNavController()
 
+                    //val handwrittenFont = FontFamily(Font(R.font.))
+
                     // get db instance
                     val db = AppDatabase.getInstance(applicationContext)
                     App(navController = navController, modifier= Modifier.padding(innerPadding), db)
@@ -60,7 +65,13 @@ fun App(navController: NavController, modifier: Modifier, db: AppDatabase){
     Scaffold (
         topBar = {
             TopAppBar(
-                title = { Text(text = "Dose Reminder App")}
+                title = {
+                    Text(
+                        text = "Dose Reminder",
+                        color = Color(255, 68, 13)
+                        //fontFamily = FontFamily.Serif
+                    )
+                }
             )
         },
         bottomBar = { BottomNav(navController = navController)
