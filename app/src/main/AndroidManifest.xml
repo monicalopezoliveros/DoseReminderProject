@@ -18,6 +18,12 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.DoseReminderApp">
+        </activity>
+        <activity
+            android:name=".SingInActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.DoseReminderApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

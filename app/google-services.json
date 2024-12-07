@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "615748638559",
+    "project_id": "dosereminder-9123c",
+    "storage_bucket": "dosereminder-9123c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:615748638559:android:e842953cae456d007448ea",
+        "android_client_info": {
+          "package_name": "com.example.dosereminderapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMWTegYZz3yzj7L4uJZFjOIzCcmRsY_7Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
