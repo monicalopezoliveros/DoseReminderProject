@@ -10,6 +10,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+/**
+ * ProductManager handles fetching and managing product data
+ * from the OpenFDA API and provides methods for searching and clearing products.
+ */
 class ProductManager {
     //(database: AppDatabase)
     private var _productResponse = mutableStateOf<List<Result>>(emptyList())
@@ -42,13 +46,19 @@ class ProductManager {
         })
     }
 
+    /**
+     * Initiates a search for products based on the given brand name.
+     * @param brandName The name of the brand to search for.
+     */
     fun searchProducts(brandName: String) {
         getProducts(brandName)
     }
 
-    // Nuevo método para limpiar la lista de productos
+    /**
+     * Clears the current product list.
+     */
     fun clearProducts() {
-        _productResponse.value = emptyList() // Limpia la lista de productos
+        _productResponse.value = emptyList()
     }
 
 }

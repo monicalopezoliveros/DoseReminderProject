@@ -9,7 +9,7 @@ import com.example.dosereminderapp.api.model.Product
 
 @Dao
 interface ProductDao {
-
+    // Insert a new product
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertProduct(product: Product)
 

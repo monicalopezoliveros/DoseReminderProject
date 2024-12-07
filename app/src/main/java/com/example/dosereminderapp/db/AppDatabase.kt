@@ -8,6 +8,11 @@ import com.example.dosereminderapp.api.model.Medication
 import com.example.dosereminderapp.api.model.Product
 import com.example.dosereminderapp.api.model.Reminder
 
+/**
+ * AppDatabase is the database class used for managing the app's local data.
+ * It uses Room for database operations and contains DAOs (Data Access Objects)
+ * for accessing the `Medication` and `Reminder` entities.
+ */
 @Database(entities = [Medication::class, Reminder::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 

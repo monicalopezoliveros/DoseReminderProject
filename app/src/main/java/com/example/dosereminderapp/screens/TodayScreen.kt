@@ -30,6 +30,14 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Composable function to display the "Today" screen, which shows reminders for today.
+ * It fetches reminders from the database and displays them in a list.
+ * If no reminders are available, a message is shown instead.
+ *
+ * @param modifier The modifier to be applied to the root composable.
+ * @param db The database instance used to fetch reminders.
+ */
 @Composable
 fun TodayScreen(modifier: Modifier, db: AppDatabase) {
     //val reminders = remember { mutableStateOf(listOf<Reminder>()) }
@@ -37,7 +45,7 @@ fun TodayScreen(modifier: Modifier, db: AppDatabase) {
 
     LaunchedEffect(Unit) {
         // Get the reminders
-        //reminders.value = db.reminderDao().getAllReminders()
+
         reminders.value = db.reminderDao().getAllRemindersWithMedicationNames()
     }
 
@@ -81,6 +89,12 @@ fun TodayScreen(modifier: Modifier, db: AppDatabase) {
     }
 }
 
+/**
+ * Composable function to display a reminder card with medication name and reminder time.
+ * This is used in the list of reminders on the "Today" screen.
+ *
+ * @param reminder The reminder object to be displayed in the card.
+ */
 @Composable
 fun ReminderCard(reminder: ReminderWithMedicationName) {
     // Format reminder time

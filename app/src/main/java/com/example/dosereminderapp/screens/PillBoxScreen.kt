@@ -28,6 +28,15 @@ import com.example.dosereminderapp.db.AppDatabase
 import com.example.dosereminderapp.api.model.Medication
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the "Pill Box" screen, which shows a list of medications.
+ * It fetches medications from the database and displays them in a list of cards.
+ * Each card shows information about the medication, such as name, quantity, dosage, frequency, and time.
+ * The user can delete medications from the list by tapping on the delete icon.
+ *
+ * @param modifier The modifier to be applied to the root composable.
+ * @param db The database instance used to fetch and delete medications.
+ */
 @Composable
 fun PillBoxScreen(modifier: Modifier, db: AppDatabase) {
     // Remember the medications list to display them
@@ -76,6 +85,15 @@ fun PillBoxScreen(modifier: Modifier, db: AppDatabase) {
     }
 }
 
+/**
+ * Composable function to display a card for each medication in the "Pill Box" screen.
+ * The card shows the medication's name, quantity, dosage, frequency, and time.
+ * The user can delete the medication by tapping the delete icon.
+ *
+ * @param medication The medication object to be displayed in the card.
+ * @param db The database instance used to delete the medication.
+ * @param onDelete A callback function to update the list of medications after deletion.
+ */
 @Composable
 fun MedicationCard(medication: Medication, db: AppDatabase, onDelete: (Int) -> Unit) {
     Card(
@@ -128,6 +146,13 @@ fun MedicationCard(medication: Medication, db: AppDatabase, onDelete: (Int) -> U
     }
 }
 
+/**
+ * Function to delete a medication from the database and update the list of medications.
+ *
+ * @param db The database instance used to delete the medication.
+ * @param medicationId The ID of the medication to be deleted.
+ * @param onDelete A callback function to update the UI after the medication is deleted.
+ */
 fun deleteMedication(db: AppDatabase, medicationId: Int, onDelete: (Int) -> Unit) {
     // Coroutine to delete the medication from the database
     kotlinx.coroutines.GlobalScope.launch {

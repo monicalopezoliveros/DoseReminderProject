@@ -46,7 +46,15 @@ import com.example.dosereminderapp.api.model.Product
 import com.example.dosereminderapp.api.model.Result
 import com.example.dosereminderapp.destinations.Destination
 
-
+/**
+ * AddMedicineScreen displays a screen where the user can search for medications by typing the name.
+ * After entering the medication name, the user can click "Search" to fetch the list of products.
+ * It also displays a list of search results, allowing the user to select a product and navigate to
+ * the reminder configuration screen.
+ *
+ * @param modifier The modifier to be applied to the UI elements of the screen.
+ * @param navController The NavController used for navigating to the next screen when a product is selected.
+ */
 @Composable
 fun AddMedicineScreen(modifier: Modifier, navController: NavController){
     val productManager = remember { ProductManager() }
@@ -133,6 +141,14 @@ fun AddMedicineScreen(modifier: Modifier, navController: NavController){
     }
 }
 
+/**
+ * ProductList displays a list of products fetched from a search. It shows the products one by one
+ * in a scrollable list, allowing the user to select a product to proceed.
+ *
+ * @param products The list of products to display.
+ * @param hasSearched A flag that indicates if a search has been performed.
+ * @param onProductSelected A callback function that is called when a product is selected from the list.
+ */
 @Composable
 fun ProductList(
     products: List<Result>,
@@ -170,6 +186,14 @@ fun ProductList(
     }
 }
 
+/**
+ * ProductItem displays a single product within a card. It shows the product's name and strength
+ * and highlights the selected product with a different background color.
+ *
+ * @param product The product to display.
+ * @param onClick A callback function that is triggered when the product item is clicked.
+ * @param isSelected A boolean indicating whether the product is currently selected.
+ */
 @Composable
 fun ProductItem(
     product: Product,

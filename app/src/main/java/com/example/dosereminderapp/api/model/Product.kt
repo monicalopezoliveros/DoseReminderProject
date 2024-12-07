@@ -5,6 +5,10 @@ import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+/**
+ * This data class represents a product in the database, including its details such as product number, brand name,
+ * active ingredients, and other related information. It is used to hold the product data from the API response.
+ */
 @JsonClass(generateAdapter = true)
 @Entity
 data class Product(

@@ -20,7 +20,14 @@ import com.example.dosereminderapp.R
 
 import com.example.dosereminderapp.destinations.Destination
 
-
+/**
+ * Composable function to display the bottom navigation bar.
+ * It contains three navigation items: Today, PillBox, and AddMedicine.
+ * Each item is represented with an icon and label.
+ * When an item is selected, the navigation controller navigates to the respective screen.
+ *
+ * @param navController The NavController responsible for managing navigation actions.
+ */
 @Composable
 fun BottomNav(navController: NavController){
     NavigationBar {

@@ -5,6 +5,10 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
+/**
+ * Api object provides Retrofit service for making API calls to the FDA.
+ * It initializes Retrofit with Moshi to convert JSON into Kotlin objects.
+ */
 object Api {
     private val BASE_URL = "https://api.fda.gov/"
 

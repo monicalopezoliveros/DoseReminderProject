@@ -51,6 +51,10 @@ import java.time.format.DateTimeFormatter
 
 import java.util.*
 
+/**
+ * This function represents the configuration screen for setting up a reminder for a medication.
+ * It allows users to select quantity, dosage, frequency, time, and when the reminder should start.
+ */
 @Composable
 fun ConfigReminderScreen(modifier: Modifier, productName: String, db: AppDatabase, navController: NavController) {
     var selectedOption by remember { mutableStateOf("Option 1") }
